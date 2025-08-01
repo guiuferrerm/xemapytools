@@ -1,0 +1,9 @@
+[project]
+name = "xemapytools"
+version = "0.1.0"
+description = "Utilities to fetch and normalize XEMA meteorological data from Catalonia"
+readme = "README.md"
+license = { text = "Mozilla Public License 2.0" }
+dependencies = [
+  "pandas >= 2.2.3"
+]
