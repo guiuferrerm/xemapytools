@@ -17,8 +17,8 @@ STATIONS_STANDARD_DTYPES_MAPPING = {
     "nom_xarxa": str,
     "codi_estat": str,
     "nom_estat": str,
-    "data_alta": "datetime",
-    "data_baixa": "datetime"
+    "data_alta": "datetime_utc",
+    "data_baixa": "datetime_utc"
 }
 
 VARIABLES_STANDARD_DTYPES_MAPPING = {
