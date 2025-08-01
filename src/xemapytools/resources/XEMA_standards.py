@@ -13,22 +13,27 @@ STATIONS_STANDARD_DTYPES_MAPPING = {
     "nom_comarca": str,
     "codi_provincia": str,
     "nom_provincia": str,
-    "codi_xarxa": str
+    "codi_xarxa": str,
+    "nom_xarxa": str,
+    "codi_estat": str,
+    "nom_estat": str,
+    "data_alta": "datetime",
+    "data_baixa": "datetime"
 }
 
 VARIABLES_STANDARD_DTYPES_MAPPING = {
-    "codi_variable": float,
+    "codi_variable": str, #inconsistency
     "nom_variable": str,
     "unitat": str,
     "acronim": str,
     "codi_tipus_var": str,
-    "decimals": float
+    "decimals": int
 }
 
 WEATHER_DATA_STANDARD_DTYPES_MAPPING = {
     "id": str,
     "codi_estacio": str,
-    "codi_variable": float, #inconsistency
+    "codi_variable": str,
     "data_lectura": "datetime_utc",
     "data_extrem": "datetime_utc",
     "valor_lectura": float,
