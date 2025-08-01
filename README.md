@@ -14,7 +14,7 @@
  
  ```
  pip install pandas
- pip install git+https://github.com/guiuferrerm/xemapytools.git@v0.1.0
+ pip install git+https://github.com/guiuferrerm/xemapytools.git@v0.1.1
  ```
  
  ## Usage
