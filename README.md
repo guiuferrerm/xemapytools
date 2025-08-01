@@ -72,6 +72,7 @@ print(stdz_data.head())
 ```
 
 Without library installed, run the example file with:
+
 ```bash
 PYTHONPATH=src python examples/examplefile.py
 ```
