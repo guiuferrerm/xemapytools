@@ -14,9 +14,8 @@
  
  ```
  pip install pandas
+ pip install git+https://github.com/guiuferrerm/xemapytools.git@v0.1.0
  ```
- 
- Clone this repository or download the source code and include `xemapytools.py` in your project.
  
  ## Usage
 
