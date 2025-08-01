@@ -28,7 +28,7 @@ VARIABLES_STANDARD_DTYPES_MAPPING = {
 WEATHER_DATA_STANDARD_DTYPES_MAPPING = {
     "id": str,
     "codi_estacio": str,
-    "codi_variable": str,
+    "codi_variable": float, #inconsistency
     "data_lectura": "datetime_utc",
     "data_extrem": "datetime_utc",
     "valor_lectura": float,
