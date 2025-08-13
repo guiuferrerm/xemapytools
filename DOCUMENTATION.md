@@ -90,8 +90,43 @@ This module defines standard column names and data type mappings for XEMA datase
 
 ---
 
+## 3. data_download.py
 
-## Example usage
+Contains functions for downloading data from URLs.
+
+### Functions:
+- `download_simple_csv_from_url_as_dataframe(url: str) -> pd.DataFrame`  
+  Downloads a CSV file from a URL and returns it as a pandas DataFrame.
+- `fetch_socrata_csv_with_filters(url: str, filters: dict) -> pd.DataFrame`  
+  Fetches CSV data from Socrata endpoints with optional filters.
+
+---
+
+## 4. data_management_main_functions.py
+
+Contains high-level orchestration functions.
+
+### Functions:
+- `download_and_backup_XEMA_reference_dataframes(base_dir: Union[Path, str], overwrite: bool = True) -> dict[str, Path]`  
+  Downloads XEMA reference CSVs (stations and variables), standardizes them, and saves locally. Returns a mapping of descriptive names to saved file paths.
+
+---
+
+## 5. data_treatment.py
+
+Contains functions for cleaning and standardizing DataFrames.
+
+### Functions:
+- `standardize_dataframe(df: pd.DataFrame, standard_dtype_map: StandardMap, standard_coltoapi_map: Dict[str, str]) -> pd.DataFrame`  
+  Standardizes column names and coerces data types according to mapping.
+- `save_dataframe_to_local_csv(df: pd.DataFrame, filepath: Union[Path, str], index: bool = False, overwrite: bool = True) -> None`  
+  Saves a DataFrame to a local CSV file, creating parent directories automatically.
+- `load_local_csv_as_dataframe(filepath: Union[Path, str], **read_csv_kwargs) -> pd.DataFrame`  
+  Loads a CSV from local storage into a pandas DataFrame.
+
+---
+
+## Example usage app
 
 ```python
 import logging
