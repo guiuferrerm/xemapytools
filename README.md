@@ -16,12 +16,12 @@
 
  ```
  pip install pandas
- pip install --upgrade git+https://github.com/guiuferrerm/xemapytools.git@v0.1.1
+ pip install --upgrade git+https://github.com/guiuferrerm/xemapytools.git@v1.0.0
  ```
 
  To update the package, just run:
  ```
- pip install --upgrade git+https://github.com/guiuferrerm/xemapytools.git@v0.1.1
+ pip install --upgrade git+https://github.com/guiuferrerm/xemapytools.git@v1.0.0
  ```
  
  ## Data Type Mappings & URLs
