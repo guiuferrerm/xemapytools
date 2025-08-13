@@ -63,7 +63,7 @@
  
  ## Contributing
  
- ⚠️ This project is **not actively maintained**.  
+ ⚠️⚠️ This project is **not actively maintained** ⚠️⚠️
  However, if you want to submit issues or pull requests, please follow **PEP 8** style guidelines for Python code.
  
  ## License
