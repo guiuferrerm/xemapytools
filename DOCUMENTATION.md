@@ -89,16 +89,33 @@ This module defines standard column names and data type mappings for XEMA datase
 - `DAILY_WEATHER_DATA_STANDARD_DTYPES_MAPPING`
 
 ---
-
 ## 3. data_download.py
 
 Contains functions for downloading data from URLs.
 
 ### Functions:
-- `download_simple_csv_from_url_as_dataframe(url: str) -> pd.DataFrame`  
-  Downloads a CSV file from a URL and returns it as a pandas DataFrame.
-- `fetch_socrata_csv_with_filters(url: str, filters: dict) -> pd.DataFrame`  
-  Fetches CSV data from Socrata endpoints with optional filters.
+- `download_simple_csv_from_url_as_dataframe(url: str, headers: Optional[Dict[str, str]] = None, encoding: str = "utf-8") -> pd.DataFrame`  
+  Downloads a CSV file from a URL using `urllib`. Handles gzip/deflate response encoding if present, decodes with the specified encoding, and returns a pandas DataFrame. Logs info about download success or errors.
+
+- `build_soql_where_clause(filters: Optional[Dict[str, Condition]] = None, raw_filter: Optional[str] = None) -> str`  
+  Builds a SOQL `where` clause from a filter dictionary or a raw filter string. Supports date columns (`data_lectura`, `data_extrem`) with proper formatting, as well as general column/value filtering. This function internally formats SOQL where clauses from filter dictionaries; users do not need to call helper functions directly.
+
+- `fetch_socrata_csv_with_filters(base_url_soql: str, filters: Optional[Dict[str, Condition]] = None, raw_filter: Optional[str] = None, limit: int = 5000, max_rows: Optional[int] = 50000, app_token: Optional[str] = None, timeout: float = 30.0) -> pd.DataFrame`  
+  Fetches CSV data from a Socrata endpoint using the given filters. Handles pagination with `limit` and `offset` and returns a concatenated pandas DataFrame. Properly logs HTTP errors, empty responses, and progress.
+
+ #### Filters for fetch_socrata_csv_with_filters
+ - Format: filters: Dict[str, Condition] where each key is a column name and each value (Condition) can be:
+ - A single value → exact match, e.g. "station_id": "123"
+ - A tuple (operator, value) → custom operator, e.g. "temperature": (">=", 25)
+ - A list of values/tuples → combined with AND, e.g. "temperature": [(">=", 25), ("<=", 30)]
+
+ - Supported operators (examples):
+ - "=", "!=", ">", ">=", "<", "<="
+
+ - Datetime columns (if present in dataset) are automatically converted from "%d/%m/%Y %I:%M:%S %p" to SOQL format. Example:
+ python  filters = {  "data_lectura": (">=", "01/01/2025 12:00:00 AM"),  "station_id": "123"  } 
+
+ - Alternative: raw_filter allows passing a raw SOQL where string directly if advanced filtering is needed.
 
 ---
 
