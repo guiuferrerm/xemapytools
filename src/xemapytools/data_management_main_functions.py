@@ -16,8 +16,9 @@ def download_and_backup_XEMA_reference_dataframes(
     overwrite: bool = True,
 ) -> dict[str, Path]:
     """
-    Download XEMA reference CSVs (stations and variables) and save standardized copies.
-    
+    Download XEMA reference CSVs (stations and variables) and save standardized copies
+    with standardized column names only.
+
     Returns a mapping of descriptive names to saved file paths.
     """
     base = Path(base_dir)
@@ -30,20 +31,18 @@ def download_and_backup_XEMA_reference_dataframes(
         (
             "stations_raw",
             url_list.STATIONS_METADATA_CSV_URL,
-            XEMA_standards.STATIONS_STANDARD_DTYPES_MAPPING,
             XEMA_standards.STATIONS_STANDARD_COLTOAPI_MAPPING,
             base / "stations_raw_metadata.csv",
         ),
         (
             "variables_raw",
             url_list.VARIABLES_METADATA_CSV_URL,
-            XEMA_standards.VARIABLES_STANDARD_DTYPES_MAPPING,
             XEMA_standards.VARIABLES_STANDARD_COLTOAPI_MAPPING,
             base / "variables_raw_metadata.csv",
         ),
     ]
 
-    for name, url, dtypes_map, col_map, path in resources:
+    for name, url, col_map, path in resources:
         try:
             logger.info(f"Downloading {name} metadata from {url}")
             raw_df: pd.DataFrame = data_download.download_simple_csv_from_url_as_dataframe(url)
@@ -54,7 +53,7 @@ def download_and_backup_XEMA_reference_dataframes(
             raise
 
         try:
-            stdz_df = data_treatment.standardize_dataframe(raw_df, dtypes_map, col_map)
+            stdz_df = data_treatment.standardize_dataframe(raw_df, standard_coltoapi_map=col_map)
             data_treatment.save_dataframe_to_local_csv(stdz_df, path, overwrite=overwrite)
             logger.info(f"{name.capitalize()} metadata saved to {path}")
             saved_paths[name] = path

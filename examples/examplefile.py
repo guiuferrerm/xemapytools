@@ -1,5 +1,8 @@
+import plotly.express as px
+
 import logging
 from pathlib import Path
+import pandas as pd
 
 import xemapytools.data_management_main_functions as dmmf
 import xemapytools.data_treatment as dtre
@@ -9,10 +12,9 @@ from xemapytools.resources import url_list, XEMA_standards
 logging.basicConfig(level=logging.INFO)
 
 BASE_DIR = Path("examples/data_store")
-BASE_DIR.mkdir(exist_ok=True)
 
 UPDATE_REFERENCE_DATAFRAMES = True
-DOWNLOAD_WEATHER_DATA = False
+DOWNLOAD_WEATHER_DATA = True
 
 if UPDATE_REFERENCE_DATAFRAMES:
     paths = dmmf.download_and_backup_XEMA_reference_dataframes(BASE_DIR)
@@ -45,10 +47,30 @@ else:
 
 stdz_data = dtre.standardize_dataframe(weather_data, XEMA_standards.WEATHER_DATA_STANDARD_DTYPES_MAPPING, XEMA_standards.WEATHER_DATA_STANDARD_COLTOAPI_MAPPING)
 
-print(stdz_data)
+# Load the variables metadata
+variables_metadata = dtre.load_local_csv_as_dataframe("examples/data_store/variables_raw_metadata.csv")
 
-'''
+variables_metadata = dtre.standardize_dataframe(variables_metadata, XEMA_standards.VARIABLES_STANDARD_DTYPES_MAPPING, XEMA_standards.VARIABLES_STANDARD_COLTOAPI_MAPPING)
 
-Use stdz data and metadata for what you need: plotting, studying data, ...
+# Map codi_variable to nom_variable
+variable_map = dict(zip(variables_metadata['codi_variable'], variables_metadata['nom_variable']))
+stdz_data['variable_name'] = stdz_data['codi_variable'].map(variable_map)
 
-'''
+# Plot all variables over time, with log scale
+fig = px.line(
+    stdz_data,
+    x='data_lectura',
+    y='valor_lectura',
+    color='variable_name',       # readable variable names
+    line_group='codi_estacio',   # different lines for different stations
+    title='Weather Measurements Over Time (Log Scale)',
+    labels={
+        'data_lectura': 'Date',
+        'valor_lectura': 'Value',
+        'variable_name': 'Variable',
+        'codi_estacio': 'Station'
+    },
+    log_y=True                   # log scale on y-axis
+)
+
+fig.show()

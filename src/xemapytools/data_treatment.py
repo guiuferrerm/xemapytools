@@ -1,6 +1,6 @@
 import logging
 from pathlib import Path
-from typing import Dict, Literal, Mapping, Tuple, Union
+from typing import Dict, Literal, Mapping, Tuple, Union, Optional
 
 import pandas as pd
 
@@ -13,45 +13,40 @@ StandardMap = Mapping[str, TypeSpec]
 
 def standardize_dataframe(
     df: pd.DataFrame,
-    standard_dtype_map: StandardMap,
-    standard_coltoapi_map: Dict[str, str],
+    standard_dtype_map: Optional[StandardMap] = None,
+    standard_coltoapi_map: Optional[Dict[str, str]] = None,
 ) -> pd.DataFrame:
     """Standardize column names and data types in a DataFrame."""
     df = df.copy()
 
-    # Rename first so dtype coercion works on internal names
+    if not standard_dtype_map and not standard_coltoapi_map:
+        logger.warning("No column mapping or dtype map provided; returning copy of original DataFrame.")
+
+    # Rename columns if a mapping is provided
     if standard_coltoapi_map:
-        rename_dict = {
-            col: standard_coltoapi_map[col]
-            for col in df.columns
-            if col in standard_coltoapi_map
-        }
+        rename_dict = {col: standard_coltoapi_map[col] for col in df.columns if col in standard_coltoapi_map}
         if rename_dict:
             df = df.rename(columns=rename_dict)
 
-    # Coerce dtypes
-    for col, spec in standard_dtype_map.items():
-        if col not in df.columns:
-            continue
+    # Coerce dtypes if a dtype map is provided
+    if standard_dtype_map:
+        for col, spec in standard_dtype_map.items():
+            if col not in df.columns:
+                continue
 
-        if spec == "datetime_utc" or (isinstance(spec, tuple) and spec[0] == "datetime_utc"):
-            fmt = spec[1] if isinstance(spec, tuple) else None
-            if fmt:
+            if spec == "datetime_utc" or (isinstance(spec, tuple) and spec[0] == "datetime_utc"):
+                fmt = spec[1] if isinstance(spec, tuple) else None
                 df[col] = pd.to_datetime(df[col], format=fmt, errors="coerce", utc=True)
             else:
-                df[col] = pd.to_datetime(df[col], errors="coerce", utc=True)
-        else:
-            try:
-                if spec in (int, float):
-                    df[col] = pd.to_numeric(df[col], errors="coerce")
-                    if spec is int:
-                        df[col] = df[col].astype("Int64")
-                else:
-                    df[col] = df[col].astype(spec)
-            except Exception:
-                logger.warning(
-                    f"Failed to cast column '{col}' to {spec}; leaving as-is."
-                )
+                try:
+                    if spec in (int, float):
+                        df[col] = pd.to_numeric(df[col], errors="coerce")
+                        if spec is int:
+                            df[col] = df[col].astype("Int64")
+                    else:
+                        df[col] = df[col].astype(spec)
+                except Exception:
+                    logger.warning(f"Failed to cast column '{col}' to {spec}; leaving as-is.")
 
     return df
 
