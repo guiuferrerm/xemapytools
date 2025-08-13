@@ -7,18 +7,17 @@ The `xemapytools` library is structured as follows:
 ```
 xemapytools/
 ├── resources/
-│   ├── url_list[.py]
-│   └── XEMA_standards[.py]
-├── data_download[.py]
+│   ├── url_list.py
+│   └── XEMA_standards.py
+├── data_download.py
 │   ├── download_simple_csv_from_url_as_dataframe()
 │   └── fetch_socrata_csv_with_filters()
-├── data_management_main_functions[.py]
+├── data_management_main_functions.py
 │   └── download_and_backup_XEMA_reference_dataframes()
-└── data_treatment[.py]
+└── data_treatment.py
     ├── standardize_dataframe()
     ├── save_dataframe_to_local_csv()
     └── load_local_csv_as_dataframe()
-
 ```
 
 ### Description of Modules
@@ -27,23 +26,36 @@ xemapytools/
 - **data_treatment**: Functions for cleaning, standardizing, and transforming DataFrames.
 - **data_management_main_functions**: High-level functions that orchestrate downloading, standardizing, and saving reference data.
 - **resources**: Contains reference files and mappings used across the library:
-  - `url_list.py`: Stores URLs for reference data sources.
-        - `STATIONS_STANDARD_DTYPES_MAPPING`
+  - `url_list.py`: Stores URLs for reference data sources, including:
+    - `STATIONS_STANDARD_DTYPES_MAPPING`
+    - `VARIABLES_STANDARD_DTYPES_MAPPING`
+    - `WEATHER_DATA_STANDARD_DTYPES_MAPPING`
+    - `DAILY_WEATHER_DATA_STANDARD_DTYPES_MAPPING`
+  - `XEMA_standards.py`: Defines standard column names and data type mappings for XEMA datasets, including:
+    - `STATIONS_STANDARD_COLTOAPI_MAPPING`
+    - `VARIABLES_STANDARD_COLTOAPI_MAPPING`
+    - `WEATHER_DATA_STANDARD_COLTOAPI_MAPPING`
+    - `DAILY_WEATHER_DATA_STANDARD_COLTOAPI_MAPPING`
 
-        - `VARIABLES_STANDARD_DTYPES_MAPPING`
+### Importing
 
-        - `WEATHER_DATA_STANDARD_DTYPES_MAPPING`
+When importing, the commands should follow the structure described above:
 
-        - `DAILY_WEATHER_DATA_STANDARD_DTYPES_MAPPING`
- 
-  - `XEMA_standards.py`: Defines standard column names and data type mappings for XEMA datasets.
-        - `STATIONS_STANDARD_COLTOAPI_MAPPING`
+```python
+import xemapytools.data_management_main_functions as xptdmmf
+import xemapytools.data_treatment as xptdt
+import xemapytools.data_download as xptdd
+from xemapytools.resources import url_list, XEMA_standards
+```
 
-        - `VARIABLES_STANDARD_COLTOAPI_MAPPING`
+And the modules should be later accessed as:
 
-        - `WEATHER_DATA_STANDARD_COLTOAPI_MAPPING`
-        
-        - `DAILY_WEATHER_DATA_STANDARD_COLTOAPI_MAPPING`
+```python
+xptdt.load_local_csv_as_dataframe(...)
+XEMA_standards.WEATHER_DATA_STANDARD_COLTOAPI_MAPPING
+...
+```
+
 
 
 ## Example usage
