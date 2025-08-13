@@ -91,45 +91,31 @@ This module defines standard column names and data type mappings for XEMA datase
 ---
 ## 3. data_download.py
 
-Contains functions for downloading data from URLs and fetching Socrata CSVs with optional filters. Handles decompression, encoding, and pagination.
+Contains functions for downloading data from URLs.
 
 ### Functions:
+- `download_simple_csv_from_url_as_dataframe(url: str, headers: Optional[Dict[str, str]] = None, encoding: str = "utf-8") -> pd.DataFrame`  
+  Downloads a CSV file from a URL using `urllib`. Handles gzip/deflate response encoding if present, decodes with the specified encoding, and returns a pandas DataFrame. Logs info about download success or errors.
 
-- `download_simple_csv_from_url_as_dataframe(url: str, headers: Optional[Dict[str, str]] = None, encoding: str = "utf-8") -> pd.DataFrame`
- Downloads a CSV file from the specified URL using `urllib`. Returns a pandas DataFrame.
- - Parameters:
- - `url` – The CSV URL to download.
- - `headers` – Optional dictionary of HTTP headers to include in the request. Defaults to `{"User-Agent": "python-urllib/3.x"}` if not provided.
- - `encoding` – Text encoding used to decode the response. Defaults to `"utf-8"`.
- - Returns:
- - A pandas DataFrame containing the CSV data.
- - Behavior:
- - Handles gzip and deflate encoded responses.
- - Logs download progress, errors, and the number of rows successfully parsed.
+- `build_soql_where_clause(filters: Optional[Dict[str, Condition]] = None, raw_filter: Optional[str] = None) -> str`  
+  Builds a SOQL `where` clause from a filter dictionary or a raw filter string. Supports date columns (`data_lectura`, `data_extrem`) with proper formatting, as well as general column/value filtering. This function internally formats SOQL where clauses from filter dictionaries; users do not need to call helper functions directly.
 
-- `fetch_socrata_csv_with_filters(base_url_soql: str, filters: Optional[Dict[str, Condition]] = None, raw_filter: Optional[str] = None, limit: int = 5000, max_rows: Optional[int] = 50000, app_token: Optional[str] = None, timeout: float = 30.0) -> pd.DataFrame`
- Fetches CSV data from a Socrata endpoint using the given filters. Handles pagination with `$limit` and `$offset` and returns a concatenated pandas DataFrame.
- - Parameters:
-    - `base_url_soql` – Base Socrata URL (CSV or API endpoint).
-    - `filters` – Optional dictionary mapping column names to conditions for filtering. Conditions can be:
-        - `str`, `int`, `float` → equality filter
-        - `(operator, value)` tuple → e.g., `(">", 100)`
-        - List of values or tuples → combined with `AND`
-        - `raw_filter` – Optional raw SOQL `$where` clause as a string. Overrides `filters` if provided.
-        - `limit` – Number of rows to fetch per request (pagination). Defaults to 5000.
-        - `max_rows` – Maximum total rows to fetch. Defaults to 50,000.
-        - `app_token` – Optional Socrata App Token for authentication.
-        - `timeout` – Timeout in seconds for each HTTP request. Defaults to 30.0.
- - Returns:
-    - A pandas DataFrame containing all rows fetched from the endpoint, concatenated across pages.
- - Behavior:
-    - Builds a SOQL `$where` clause from `filters` internally.
-     - Handles datetime columns (`data_lectura`, `data_extrem`) by converting input strings to Socrata datetime format.
-    - Logs each fetch, including URL, HTTP errors, and number of rows returned per page.
-    - Stops fetching when fewer rows than `limit` are returned or `max_rows` is reached.
-    - Returns an empty DataFrame if errors occur or no data is returned.
- - Supported filter operators: `=`, `!=`, `>`, `<`, `>=`, `<=`
+- `fetch_socrata_csv_with_filters(base_url_soql: str, filters: Optional[Dict[str, Condition]] = None, raw_filter: Optional[str] = None, limit: int = 5000, max_rows: Optional[int] = 50000, app_token: Optional[str] = None, timeout: float = 30.0) -> pd.DataFrame`  
+  Fetches CSV data from a Socrata endpoint using the given filters. Handles pagination with `limit` and `offset` and returns a concatenated pandas DataFrame. Properly logs HTTP errors, empty responses, and progress.
 
+ #### Filters for fetch_socrata_csv_with_filters
+ - Format: filters: Dict[str, Condition] where each key is a column name and each value (Condition) can be:
+ - A single value → exact match, e.g. "station_id": "123"
+ - A tuple (operator, value) → custom operator, e.g. "temperature": (">=", 25)
+ - A list of values/tuples → combined with AND, e.g. "temperature": [(">=", 25), ("<=", 30)]
+
+ - Supported operators (examples):
+ - "=", "!=", ">", ">=", "<", "<="
+
+ - Datetime columns (if present in dataset) are automatically converted from "%d/%m/%Y %I:%M:%S %p" to SOQL format. Example:
+ python  filters = {  "data_lectura": (">=", "01/01/2025 12:00:00 AM"),  "station_id": "123"  } 
+
+ - Alternative: raw_filter allows passing a raw SOQL where string directly if advanced filtering is needed.
 ---
 
 ## 4. data_management_main_functions.py
