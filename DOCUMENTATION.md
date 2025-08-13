@@ -29,14 +29,20 @@ xemapytools/
 - **resources**: Contains reference files and mappings used across the library:
   - `url_list.py`: Stores URLs for reference data sources.
         - `STATIONS_STANDARD_DTYPES_MAPPING`
+
         - `VARIABLES_STANDARD_DTYPES_MAPPING`
+
         - `WEATHER_DATA_STANDARD_DTYPES_MAPPING`
+
         - `DAILY_WEATHER_DATA_STANDARD_DTYPES_MAPPING`
  
   - `XEMA_standards.py`: Defines standard column names and data type mappings for XEMA datasets.
         - `STATIONS_STANDARD_COLTOAPI_MAPPING`
+
         - `VARIABLES_STANDARD_COLTOAPI_MAPPING`
+
         - `WEATHER_DATA_STANDARD_COLTOAPI_MAPPING`
+        
         - `DAILY_WEATHER_DATA_STANDARD_COLTOAPI_MAPPING`
 
 
