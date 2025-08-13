@@ -10,10 +10,11 @@ from datetime import datetime
 
 logger = logging.getLogger(__name__)
 
+
 def download_simple_csv_from_url_as_dataframe(
     url: str,
     headers: Optional[Dict[str, str]] = None,
-    encoding: str = "utf-8"
+    encoding: str = "utf-8",
 ) -> pd.DataFrame:
     """
     Download a CSV from the given URL using urllib and return a pandas DataFrame.
@@ -68,6 +69,7 @@ Condition = Union[
     List[Union[Tuple[str, Union[str, int, float]], str, int, float]],
 ]
 
+
 def _format_soql_literal(v: Union[str, int, float]) -> str:
     if isinstance(v, str):
         escaped_v = v.replace("'", "''")
@@ -79,6 +81,9 @@ def build_soql_where_clause(
     filters: Optional[Dict[str, Condition]] = None,
     raw_filter: Optional[str] = None,
 ) -> str:
+    """
+    Build a SOQL WHERE clause from filter dictionary or raw string.
+    """
     if raw_filter:
         logger.debug(f"Using raw SOQL filter: {raw_filter}")
         return raw_filter.strip()
@@ -99,7 +104,10 @@ def build_soql_where_clause(
                 soql_dt_str = dt_obj.strftime(_DATETIME_SOQL_FORMAT)
                 return f"{col} = '{soql_dt_str}'"
         except ValueError as e:
-            logger.warning(f"Could not parse date string '{c_val}' for filter '{col}': {e}. This filter will be applied locally only.")
+            logger.warning(
+                f"Could not parse date string '{c_val}' for filter '{col}': {e}. "
+                "This filter will be applied locally only."
+            )
             return None
 
     for col, cond in filters.items():
@@ -117,6 +125,7 @@ def build_soql_where_clause(
                 if soql_cond:
                     clauses.append(soql_cond)
         else:
+
             def process_single_general(c):
                 if isinstance(c, tuple):
                     op, v = c
@@ -146,6 +155,10 @@ def fetch_socrata_csv_with_filters(
     app_token: Optional[str] = None,
     timeout: float = 30.0,
 ) -> pd.DataFrame:
+    """
+    Fetch CSV from Socrata using filters, returning a pandas DataFrame.
+    Handles pagination with $limit and $offset.
+    """
     headers = {
         "User-Agent": "python-urllib/3.x",
     }
@@ -154,8 +167,10 @@ def fetch_socrata_csv_with_filters(
 
     soql_where_clause_server = build_soql_where_clause(filters, raw_filter)
 
-    logger.info(f"Starting data fetch from {base_url_soql} with filters: {filters}")
-    
+    logger.info(
+        f"Starting data fetch from {base_url_soql} with filters: {filters}"
+    )
+
     offset = 0
     chunks = []
 
@@ -169,8 +184,15 @@ def fetch_socrata_csv_with_filters(
             if soql_where_clause_server:
                 params["$where"] = soql_where_clause_server
 
-            url_with_extension = base_url_soql if base_url_soql.endswith('.csv') else f"{base_url_soql}.csv"
-            encoded = "&".join(f"{k}={urllib.parse.quote(str(v), safe='')}" for k, v in params.items())
+            url_with_extension = (
+                base_url_soql
+                if base_url_soql.endswith(".csv")
+                else f"{base_url_soql}.csv"
+            )
+            encoded = "&".join(
+                f"{k}={urllib.parse.quote(str(v), safe='')}"
+                for k, v in params.items()
+            )
             url = f"{url_with_extension}?{encoded}"
 
             logger.debug(f"Fetching URL: {url}")
@@ -180,7 +202,7 @@ def fetch_socrata_csv_with_filters(
                 csv_bytes = resp.read()
                 csv_str = csv_bytes.decode("utf-8", errors="replace")
 
-                if not csv_str.strip() or csv_str.strip().count('\n') == 0:
+                if not csv_str.strip() or csv_str.strip().count("\n") == 0:
                     df_chunk = pd.DataFrame()
                 else:
                     try:
@@ -188,7 +210,10 @@ def fetch_socrata_csv_with_filters(
                     except pd.errors.EmptyDataError:
                         df_chunk = pd.DataFrame()
                     except Exception as e:
-                        logger.error(f"Error reading CSV chunk: {e}. Raw CSV snippet: {csv_str[:500]}...")
+                        logger.error(
+                            f"Error reading CSV chunk: {e}. Raw CSV snippet: "
+                            f"{csv_str[:500]}..."
+                        )
                         df_chunk = pd.DataFrame()
 
             if df_chunk.empty:
@@ -222,7 +247,7 @@ def fetch_socrata_csv_with_filters(
     if not chunks:
         logger.warning("No data fetched, returning empty DataFrame.")
         return pd.DataFrame()
-    
+
     result_df = pd.concat(chunks, ignore_index=True)
     logger.info(f"Fetched total {len(result_df)} rows from {base_url_soql}")
     return result_df

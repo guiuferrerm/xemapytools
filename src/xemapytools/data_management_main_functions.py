@@ -10,12 +10,14 @@ import xemapytools.resources.url_list as url_list
 
 logger = logging.getLogger(__name__)
 
+
 def download_and_backup_XEMA_reference_dataframes(
     base_dir: Union[Path, str],
     overwrite: bool = True,
 ) -> dict[str, Path]:
     """
     Download XEMA reference CSVs (stations and variables) and save standardized copies.
+    
     Returns a mapping of descriptive names to saved file paths.
     """
     base = Path(base_dir)
@@ -25,12 +27,20 @@ def download_and_backup_XEMA_reference_dataframes(
     saved_paths: dict[str, Path] = {}
 
     resources = [
-        ("stations_raw", url_list.STATIONS_METADATA_CSV_URL, 
-         XEMA_standards.STATIONS_STANDARD_DTYPES_MAPPING, XEMA_standards.STATIONS_STANDARD_COLTOAPI_MAPPING,
-         base / "stations_raw_metadata.csv"),
-        ("variables_raw", url_list.VARIABLES_METADATA_CSV_URL, 
-         XEMA_standards.VARIABLES_STANDARD_DTYPES_MAPPING, XEMA_standards.VARIABLES_STANDARD_COLTOAPI_MAPPING,
-         base / "variables_raw_metadata.csv")
+        (
+            "stations_raw",
+            url_list.STATIONS_METADATA_CSV_URL,
+            XEMA_standards.STATIONS_STANDARD_DTYPES_MAPPING,
+            XEMA_standards.STATIONS_STANDARD_COLTOAPI_MAPPING,
+            base / "stations_raw_metadata.csv",
+        ),
+        (
+            "variables_raw",
+            url_list.VARIABLES_METADATA_CSV_URL,
+            XEMA_standards.VARIABLES_STANDARD_DTYPES_MAPPING,
+            XEMA_standards.VARIABLES_STANDARD_COLTOAPI_MAPPING,
+            base / "variables_raw_metadata.csv",
+        ),
     ]
 
     for name, url, dtypes_map, col_map, path in resources:

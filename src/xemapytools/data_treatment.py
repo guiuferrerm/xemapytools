@@ -1,7 +1,8 @@
-import pandas as pd
 import logging
-from typing import Mapping, Union, Tuple, Literal, Dict
 from pathlib import Path
+from typing import Dict, Literal, Mapping, Tuple, Union
+
+import pandas as pd
 
 logger = logging.getLogger(__name__)
 
@@ -9,16 +10,26 @@ DateSpec = Union[Literal["datetime"], Tuple[Literal["datetime"], str]]
 TypeSpec = Union[type, DateSpec]
 StandardMap = Mapping[str, TypeSpec]
 
-def standardize_dataframe(df: pd.DataFrame, standard_dtype_map: StandardMap, standard_coltoapi_map: Dict[str, str]) -> pd.DataFrame:
+
+def standardize_dataframe(
+    df: pd.DataFrame,
+    standard_dtype_map: StandardMap,
+    standard_coltoapi_map: Dict[str, str],
+) -> pd.DataFrame:
+    """Standardize column names and data types in a DataFrame."""
     df = df.copy()
 
     # Rename first so dtype coercion works on internal names
     if standard_coltoapi_map:
-        rename_dict = {col: standard_coltoapi_map[col] for col in df.columns if col in standard_coltoapi_map}
+        rename_dict = {
+            col: standard_coltoapi_map[col]
+            for col in df.columns
+            if col in standard_coltoapi_map
+        }
         if rename_dict:
             df = df.rename(columns=rename_dict)
 
-    # Now coerce dtypes
+    # Coerce dtypes
     for col, spec in standard_dtype_map.items():
         if col not in df.columns:
             continue
@@ -38,9 +49,12 @@ def standardize_dataframe(df: pd.DataFrame, standard_dtype_map: StandardMap, sta
                 else:
                     df[col] = df[col].astype(spec)
             except Exception:
-                logger.warning(f"Failed to cast column '{col}' to {spec}; leaving as-is.")
+                logger.warning(
+                    f"Failed to cast column '{col}' to {spec}; leaving as-is."
+                )
 
     return df
+
 
 def save_dataframe_to_local_csv(
     df: pd.DataFrame,
@@ -54,8 +68,10 @@ def save_dataframe_to_local_csv(
     """
     path = Path(filepath)
     path.parent.mkdir(parents=True, exist_ok=True)
+
     if path.exists() and not overwrite:
         raise FileExistsError(f"{path} already exists and overwrite=False.")
+
     df.to_csv(path, index=index)
     logger.info(f"Saved DataFrame to {path}")
 
@@ -69,5 +85,6 @@ def load_local_csv_as_dataframe(filepath: Union[Path, str], **read_csv_kwargs) -
     if not path.exists():
         logger.error(f"CSV file not found: {path}")
         raise FileNotFoundError(f"CSV file not found: {path}")
+
     logger.info(f"Loading CSV from {path}")
     return pd.read_csv(path, **read_csv_kwargs)
