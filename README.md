@@ -12,17 +12,104 @@
  
  ## Installation & updates
 
- To install the package, run those two commands on terminal (pandas required):
+ To install or update the package, run those two commands on terminal (pandas required):
 
- ```
+ ```bash
  pip install pandas
  pip install --upgrade git+https://github.com/guiuferrerm/xemapytools.git@v1.0.0
  ```
 
- To update the package, just run:
- ```
- pip install --upgrade git+https://github.com/guiuferrerm/xemapytools.git@v1.0.0
- ```
+ ## For developers: testing and modifying own copies
+ This guide explains how to install `xemapytools` in **editable mode** so you can test, modify, and contribute to the library, and how to fully uninstall it afterwards.
+
+---
+
+### **1. Clone the repository**
+
+```bash
+git clone https://github.com/guiuferrerm/xemapytools.git
+cd xemapytools
+```
+
+---
+
+### **2. Create a virtual environment (optional but recommended)**
+
+```bash
+python -m venv venv
+source venv/bin/activate   # On Windows: venv\Scripts\activate
+```
+
+---
+
+### **3. Install the library in editable mode**
+
+```bash
+pip install -e .
+```
+
+- The `-e` flag installs the library in **development/editable mode**.  
+- Changes you make to the source code will immediately affect the installed library without reinstalling.
+
+---
+
+### **4. Verify installation**
+
+```bash
+pip list | grep xemapytools
+```
+
+You should see something like:
+
+```
+xemapytools (0.1.2, editable)
+```
+
+---
+---
+
+### **5. Uninstall the editable package**
+
+```bash
+pip uninstall xemapytools
+```
+
+#### Optional: Remove leftover files
+
+1. Find your site-packages directory:
+
+```bash
+python -m site
+```
+
+2. Locate the `.egg-link` file corresponding to `xemapytools` in `site-packages`.
+
+```bash
+ls path_to_site_packages/*.egg-link
+```
+
+3. Remove the `.egg-link` file manually:
+
+```bash
+rm path_to_site_packages/xemapytools.egg-link
+```
+
+4. (Optional) Edit `easy-install.pth` in the same `site-packages` folder and remove the line pointing to the development directory.
+
+---
+
+### **6. Reinstall normally (optional)**
+
+After uninstalling, if you want a regular install:
+
+```bash
+pip install .
+```
+---
+
+This setup allows contributors to **test and improve the library directly from the GitHub repository**. Any changes made to the source code will immediately reflect in the environment.
+
+---
  
  ## Data Type Mappings & URLs
  
@@ -48,7 +135,7 @@
  - `WEATHER_DATA_CSV_URL` , accessed with `fetch_socrata_csv_with_filters()`
  - `DAILY_WEATHER_DATA_CSV_URL` , accessed with `fetch_socrata_csv_with_filters()`
 
- Access those resources from `xemapytools.resources.XEMA_standards` and `xemapytools.resources.url_list` respectively`
+ Access those resources from `xemapytools.resources.XEMA_standards` and `xemapytools.resources.url_list` respectively
  
  ## Logging
  
@@ -56,9 +143,10 @@
  
  Example:
  
- ```
+ ```python
  import logging
- logging.basicConfig(level=logging.WARNING)
+ logging.basicConfig(level=logging.WARNING)  # Shows warnings about type coercion during parsing
+
  ```
  
  ## Contributing
