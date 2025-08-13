@@ -10,7 +10,7 @@ from datetime import datetime
 
 logger = logging.getLogger(__name__)
 
-def download_csv_from_url_as_dataframe(
+def download_simple_csv_from_url_as_dataframe(
     url: str,
     headers: Optional[Dict[str, str]] = None,
     encoding: str = "utf-8"

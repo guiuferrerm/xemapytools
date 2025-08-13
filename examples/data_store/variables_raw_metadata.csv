@@ -1,4 +1,4 @@
-CODI_VARIABLE,NOM_VARIABLE,UNITAT,ACRONIM,CODI_TIPUS_VAR,DECIMALS
+codi_variable,nom_variable,unitat,acronim,codi_tipus_var,decimals
 44,Humitat relativa mínima,%,HRn,DAT,0
 40,Temperatura màxima,°C,Tx,DAT,1
 46,Velocitat del vent a 2 m (esc.),m/s,VV2,DAT,1

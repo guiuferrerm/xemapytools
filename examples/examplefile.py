@@ -11,7 +11,7 @@ logging.basicConfig(level=logging.INFO)
 BASE_DIR = Path("examples/data_store")
 BASE_DIR.mkdir(exist_ok=True)
 
-UPDATE_REFERENCE_DATAFRAMES = False
+UPDATE_REFERENCE_DATAFRAMES = True
 DOWNLOAD_WEATHER_DATA = False
 
 if UPDATE_REFERENCE_DATAFRAMES:
@@ -43,7 +43,7 @@ if DOWNLOAD_WEATHER_DATA:
 else:
     weather_data = dtre.load_local_csv_as_dataframe(BASE_DIR / "downloaded_weather_data.csv")
 
-stdz_data = dtre.standardize_dataframe(weather_data, XEMA_standards.WEATHER_DATA_STANDARD_DTYPES_MAPPING)
+stdz_data = dtre.standardize_dataframe(weather_data, XEMA_standards.WEATHER_DATA_STANDARD_DTYPES_MAPPING, XEMA_standards.WEATHER_DATA_STANDARD_COLTOAPI_MAPPING)
 
 print(stdz_data)
 
