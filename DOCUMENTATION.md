@@ -7,14 +7,14 @@ The `xemapytools` library is structured as follows:
 ```
 xemapytools/
 ├── resources/
-│   ├── url_list.py
-│   └── XEMA_standards.py
-├── data_download.py
+│   ├── url_list[.py]
+│   └── XEMA_standards[.py]
+├── data_download[.py]
 │   ├── download_simple_csv_from_url_as_dataframe()
 │   └── fetch_socrata_csv_with_filters()
-├── data_management_main_functions.py
+├── data_management_main_functions[.py]
 │   └── download_and_backup_XEMA_reference_dataframes()
-└── data_treatment.py
+└── data_treatment[.py]
     ├── standardize_dataframe()
     ├── save_dataframe_to_local_csv()
     └── load_local_csv_as_dataframe()
