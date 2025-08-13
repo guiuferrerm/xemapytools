@@ -46,7 +46,7 @@
  - `VARIABLES_METADATA_CSV_URL` , accessed with `download_simple_csv_from_url_as_dataframe()`
  - `STATIONS_METADATA_CSV_URL` , accessed with `download_simple_csv_from_url_as_dataframe()`
  - `WEATHER_DATA_CSV_URL` , accessed with `fetch_socrata_csv_with_filters()`
- - `DAY_SUMMARY_WEATHER_DATA_CSV_URL` , accessed with `fetch_socrata_csv_with_filters()`
+ - `DAILY_WEATHER_DATA_CSV_URL` , accessed with `fetch_socrata_csv_with_filters()`
 
  Access those resources from `xemapytools.resources.XEMA_standards` and `xemapytools.resources.url_list` respectively`
  

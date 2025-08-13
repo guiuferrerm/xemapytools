@@ -1,6 +1,6 @@
 # xemapytools Documentation
 
-## Library Organization
+## 0. Library Organization
 
 The `xemapytools` library is structured as follows:
 
@@ -56,6 +56,39 @@ XEMA_standards.WEATHER_DATA_STANDARD_COLTOAPI_MAPPING
 ...
 ```
 
+---
+
+## 1. resources/url_list.py
+
+This module stores URLs for reference and weather data.
+
+### Main URL Endpoints
+- `VARIABLES_METADATA_CSV_URL`  
+  Accessed with `download_simple_csv_from_url_as_dataframe()`.
+- `STATIONS_METADATA_CSV_URL`  
+  Accessed with `download_simple_csv_from_url_as_dataframe()`.
+- `WEATHER_DATA_CSV_URL`  
+  Accessed with `fetch_socrata_csv_with_filters()`.
+- `DAILY_WEATHER_DATA_CSV_URL`  
+  Accessed with `fetch_socrata_csv_with_filters()`.
+
+---
+
+## 2. resources/XEMA_standards.py
+
+This module defines standard column names and data type mappings for XEMA datasets.  
+
+### Examples:
+- `STATIONS_STANDARD_COLTOAPI_MAPPING`
+- `VARIABLES_STANDARD_COLTOAPI_MAPPING`
+- `WEATHER_DATA_STANDARD_COLTOAPI_MAPPING`
+- `DAILY_WEATHER_DATA_STANDARD_COLTOAPI_MAPPING`
+- `STATIONS_STANDARD_DTYPES_MAPPING`
+- `VARIABLES_STANDARD_DTYPES_MAPPING`
+- `WEATHER_DATA_STANDARD_DTYPES_MAPPING`
+- `DAILY_WEATHER_DATA_STANDARD_DTYPES_MAPPING`
+
+---
 
 
 ## Example usage
