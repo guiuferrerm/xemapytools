@@ -1,3 +1,29 @@
+# xemapytools Documentation
+
+## Library Organization
+
+The `xemapytools` library is structured as follows:
+
+```
+xemapytools/
+├── data_download/
+├── data_treatment/
+├── data_management_main_functions/
+└── resources/
+    ├── url_list.py
+    └── XEMA_standards.py
+```
+
+### Description of Modules
+
+- **data_download**: Functions to download data from URLs, such as CSV files, into pandas DataFrames.
+- **data_treatment**: Functions for cleaning, standardizing, and transforming DataFrames.
+- **data_management_main_functions**: High-level functions that orchestrate downloading, standardizing, and saving reference data.
+- **resources**: Contains reference files and mappings used across the library:
+  - `url_list.py`: Stores URLs for reference data sources.
+  - `XEMA_standards.py`: Defines standard column names and data type mappings for XEMA datasets.
+
+
 ## Example usage
 
 ```python
