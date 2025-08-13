@@ -26,18 +26,17 @@
  
  ## Data Type Mappings & URLs
  
- The library provides standard dtype (1.) and column name(2.) mappings for the main XEMA datasets:
- 1.
+ The library provides standard dtype:
  - `STATIONS_STANDARD_DTYPES_MAPPING`
  - `VARIABLES_STANDARD_DTYPES_MAPPING`
  - `WEATHER_DATA_STANDARD_DTYPES_MAPPING`
  - `DAILY_WEATHER_DATA_STANDARD_DTYPES_MAPPING`
-
- 2.
+ And column name mappings:
  - `STATIONS_STANDARD_COLTOAPI_MAPPING`
  - `VARIABLES_STANDARD_COLTOAPI_MAPPING`
  - `WEATHER_DATA_STANDARD_COLTOAPI_MAPPING`
  - `DAILY_WEATHER_DATA_STANDARD_COLTOAPI_MAPPING`
+ for the main XEMA datasets
  
  Use them along with the function `standardize_dataframe()` for consistent column types.
 
