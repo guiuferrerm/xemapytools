@@ -6,12 +6,19 @@ The `xemapytools` library is structured as follows:
 
 ```
 xemapytools/
-├── data_download/
-├── data_treatment/
-├── data_management_main_functions/
-└── resources/
-    ├── url_list.py
-    └── XEMA_standards.py
+├── resources/
+│   ├── url_list.py
+│   └── XEMA_standards.py
+├── data_download.py
+│   ├── download_simple_csv_from_url_as_dataframe()
+│   └── fetch_socrata_csv_with_filters()
+├── data_management_main_functions.py
+│   └── download_and_backup_XEMA_reference_dataframes()
+└── data_treatment.py
+    ├── standardize_dataframe()
+    ├── save_dataframe_to_local_csv()
+    └── load_local_csv_as_dataframe()
+
 ```
 
 ### Description of Modules
@@ -21,7 +28,16 @@ xemapytools/
 - **data_management_main_functions**: High-level functions that orchestrate downloading, standardizing, and saving reference data.
 - **resources**: Contains reference files and mappings used across the library:
   - `url_list.py`: Stores URLs for reference data sources.
+        - `STATIONS_STANDARD_DTYPES_MAPPING`
+        - `VARIABLES_STANDARD_DTYPES_MAPPING`
+        - `WEATHER_DATA_STANDARD_DTYPES_MAPPING`
+        - `DAILY_WEATHER_DATA_STANDARD_DTYPES_MAPPING`
+ 
   - `XEMA_standards.py`: Defines standard column names and data type mappings for XEMA datasets.
+        - `STATIONS_STANDARD_COLTOAPI_MAPPING`
+        - `VARIABLES_STANDARD_COLTOAPI_MAPPING`
+        - `WEATHER_DATA_STANDARD_COLTOAPI_MAPPING`
+        - `DAILY_WEATHER_DATA_STANDARD_COLTOAPI_MAPPING`
 
 
 ## Example usage
