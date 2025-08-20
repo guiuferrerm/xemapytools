@@ -18,7 +18,7 @@ To install or update the package, run those two commands on terminal (pandas req
 
 ```bash
 pip install pandas
-pip install --upgrade git+https://github.com/guiuferrerm/xemapytools.git@v1.0.0
+pip install --upgrade git+https://github.com/guiuferrerm/xemapytools.git@v1.1.0
 ```
 
 ---

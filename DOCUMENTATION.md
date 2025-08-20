@@ -2,7 +2,7 @@
 
 ## 0. Library Organization
 
-The `xemapytools` library is structured as follows:
+The `xemapytools` library is now structured as follows, with the addition of a new internal utility module and updated functions.
 
 ```
 xemapytools/
@@ -12,12 +12,18 @@ xemapytools/
 ├── data_download.py
 │   ├── download_simple_csv_from_url_as_dataframe()
 │   └── fetch_socrata_csv_with_filters()
+├── _utils.py
+│   └── haversine_km()
 ├── main_functions.py
-│   └── download_and_backup_XEMA_reference_dataframes()
+│   ├── download_and_backup_XEMA_reference_dataframes()
+│   ├── get_stations_by_radius()
+│   └── get_geographic_circle()
 └── data_treatment.py
     ├── standardize_dataframe()
     ├── save_dataframe_to_local_csv()
     └── load_local_csv_as_dataframe()
+
+
 ```
 
 ### Description of Modules
@@ -26,29 +32,11 @@ xemapytools/
 
 * **data_treatment**: Functions for cleaning, standardizing, and transforming DataFrames.
 
-* **main_functions**: High-level orchestration functions that handle data processing pipelines and utility tasks, such as finding the closest station.
+* **main_functions**: High-level orchestration and utility functions that handle data processing pipelines and advanced geospatial tasks.
 
-* **resources**: Contains reference files and mappings used across the library:
+* **resources**: Contains reference files and mappings used across the library, including URLs (`url_list.py`) and standard column definitions (`XEMA_standards.py`).
 
-    * `url_list.py`: Stores URLs for reference data sources, including:
-
-        * `STATIONS_STANDARD_DTYPES_MAPPING`
-
-        * `VARIABLES_STANDARD_DTYPES_MAPPING`
-
-        * `WEATHER_DATA_STANDARD_DTYPES_MAPPING`
-
-        * `DAILY_WEATHER_DATA_STANDARD_DTYPES_MAPPING`
-
-    * `XEMA_standards.py`: Defines standard column names and data type mappings for XEMA datasets, including:
-
-        * `STATIONS_STANDARD_COLTOAPI_MAPPING`
-
-        * `VARIABLES_STANDARD_COLTOAPI_MAPPING`
-
-        * `WEATHER_DATA_STANDARD_COLTOAPI_MAPPING`
-
-        * `DAILY_WEATHER_DATA_STANDARD_COLTOAPI_MAPPING`
+* **\_utils**: An internal-only module containing auxiliary functions not intended for direct use by the end user, such as geospatial calculations. This is used by `main_functions`.
 
 ### Importing
 
@@ -59,6 +47,8 @@ import xemapytools.main_functions as xptmf
 import xemapytools.data_treatment as xptdt
 import xemapytools.data_download as xptdd
 from xemapytools.resources import url_list, XEMA_standards
+
+
 ```
 
 And the modules should be later accessed as:
@@ -67,6 +57,8 @@ And the modules should be later accessed as:
 xptdt.load_local_csv_as_dataframe(...)
 XEMA_standards.WEATHER_DATA_STANDARD_COLTOAPI_MAPPING
 ...
+
+
 ```
 
 ## 1. resources/url_list.py
@@ -77,19 +69,19 @@ This module stores URLs for reference and weather data.
 
 * `VARIABLES_METADATA_CSV_URL`
 
-    Accessed with `download_simple_csv_from_url_as_dataframe()`.
+  * Accessed with `download_simple_csv_from_url_as_dataframe()`.
 
 * `STATIONS_METADATA_CSV_URL`
 
-    Accessed with `download_simple_csv_from_url_as_dataframe()`.
+  * Accessed with `download_simple_csv_from_url_as_dataframe()`.
 
 * `WEATHER_DATA_CSV_URL`
 
-    Accessed with `fetch_socrata_csv_with_filters()`.
+  * Accessed with `fetch_socrata_csv_with_filters()`.
 
 * `DAILY_WEATHER_DATA_CSV_URL`
 
-    Accessed with `fetch_socrata_csv_with_filters()`.
+  * Accessed with `fetch_socrata_csv_with_filters()`.
 
 ## 2. resources/XEMA_standards.py
 
@@ -121,73 +113,55 @@ Contains functions for downloading data from URLs.
 
 * `download_simple_csv_from_url_as_dataframe(url: str, headers: Optional[Dict[str, str]] = None, encoding: str = "utf-8") -> pd.DataFrame`
 
-    Downloads a CSV file from a URL using `urllib`. Handles gzip/deflate response encoding if present, decodes with the specified encoding, and returns a pandas DataFrame. Logs info about download success or errors.
+  * Downloads a CSV file from a URL using `urllib`. Handles gzip/deflate response encoding if present, decodes with the specified encoding, and returns a pandas DataFrame.
 
 * `build_soql_where_clause(filters: Optional[Dict[str, Condition]] = None, raw_filter: Optional[str] = None) -> str`
 
-    Builds a SOQL `where` clause from a filter dictionary or a raw filter string. Supports date columns (`data_lectura`, `data_extrem`) with proper formatting, as well as general column/value filtering. This function internally formats SOQL where clauses from filter dictionaries; users do not need to call helper functions directly.
+  * Builds a SOQL `where` clause from a filter dictionary or a raw filter string. This function internally formats SOQL where clauses from filter dictionaries; users do not need to call helper functions directly.
 
 * `fetch_socrata_csv_with_filters(base_url_soql: str, filters: Optional[Dict[str, Condition]] = None, raw_filter: Optional[str] = None, limit: int = 5000, max_rows: Optional[int] = 50000, app_token: Optional[str] = None, timeout: float = 30.0) -> pd.DataFrame`
 
-    Fetches CSV data from a Socrata endpoint using the given filters. Handles pagination with `limit` and `offset` and returns a concatenated pandas DataFrame. Properly logs HTTP errors, empty responses, and progress.
+  * Fetches CSV data from a Socrata endpoint using the given filters. Handles pagination with `limit` and `offset` and returns a concatenated pandas DataFrame.
 
-#### Filters for fetch_socrata_csv_with_filters
+#### Filters for `fetch_socrata_csv_with_filters`
 
 * Format: `filters: Dict[str, Condition]` where each key is a column name and each value (`Condition`) can be:
 
-* A single value → exact match, e.g. `"station_id": "123"`
+  * A single value → exact match, e.g. `"station_id": "123"`
 
-* A tuple (`operator`, `value`) → custom operator, e.g. `"temperature": (">=", 25)`
+  * A tuple (`operator`, `value`) → custom operator, e.g. `"temperature": (">=", 25)`
 
-* A list of values/tuples → combined with AND, e.g. `"temperature": [(">=", 25), ("<=", 30)]`
+  * A list of values/tuples → combined with AND, e.g. `"temperature": [(">=", 25), ("<=", 30)]`
 
-* Supported operators (examples):
+* Supported operators (examples): `"=", "!=", ">", ">=", "<", "<="`
 
-* `"=", "!=", ">", ">=", "<", "<="`
+* Datetime columns are automatically converted to SOQL format.
 
-* Datetime columns (if present in dataset) are automatically converted from `"%d/%m/%Y %I:%M:%S %p"` to SOQL format. Example:
-    ```python
-    filters = {
-      "data_lectura": (">=", "01/01/2025 12:00:00 AM"),
-      "station_id": "123"
-    }
-    ```
+## 4. \_utils.py
 
-* Alternative: `raw_filter` allows passing a raw SOQL `where` string directly if advanced filtering is needed.
-
-## 4. main_functions.py
-
-Contains high-level orchestration and utility functions.
+This new internal module contains auxiliary functions not intended for direct use by the end user.
 
 ### Functions:
 
-* `download_and_backup_XEMA_reference_dataframes(base_dir: Union[Path, str], overwrite: bool = True) -> dict[str, Path]`
+* `haversine_km(lat1, lon1, lat2, lon2)`: Calculates the great-circle distance (in km) between two points using the Haversine formula.
 
-    Downloads XEMA reference CSVs (stations and variables), standardizes them, and saves locally. Returns a mapping of descriptive names to saved file paths.
+## 5. main_functions.py
 
-## 5. data_treatment.py
-
-Contains functions for cleaning and standardizing DataFrames.
+This module now includes high-level geospatial functions, in addition to the existing data downloading and backup function.
 
 ### Functions:
 
-* `standardize_dataframe(df: pd.DataFrame, standard_dtype_map: StandardMap, standard_coltoapi_map: Dict[str, str]) -> pd.DataFrame`
+* `download_and_backup_XEMA_reference_dataframes(base_dir: Union[Path, str], overwrite: bool = True) -> dict[str, Path]`: Downloads XEMA reference CSVs (stations and variables), standardizes them, and saves them locally. Returns a mapping of descriptive names to saved file paths.
 
-    Standardizes column names and coerces data types according to mapping.
+* `get_stations_by_radius(lat: float, lon: float, radius_km: float, data_source: Union[pd.DataFrame, Path, str]) -> pd.DataFrame`: Filters XEMA station data by a specific radius and returns a DataFrame with the stations found, including the distance from the central point.
 
-* `save_dataframe_to_local_csv(df: pd.DataFrame, filepath: Union[Path, str], index: bool = False, overwrite: bool = True) -> None`
-
-    Saves a DataFrame to a local CSV file, creating parent directories automatically.
-
-* `load_local_csv_as_dataframe(filepath: Union[Path, str], **read_csv_kwargs) -> pd.DataFrame`
-
-    Loads a CSV from local storage into a pandas DataFrame.
+* `get_geographic_circle(center_lat, center_lon, radius_km, n_points=100)`: Returns the latitudes and longitudes that form a geographic circle of `radius_km`.
 
 ## Example usage app
 
 ⚠️ (Uses extra library: `plotly` to plot the data)
 
-```python
+```
 import plotly.express as px
 
 import logging
@@ -218,6 +192,19 @@ else:
 stations_metadata = xptdt.load_local_csv_as_dataframe(paths["stations_raw"])
 variables_metadata = xptdt.load_local_csv_as_dataframe(paths["variables_raw"])
 
+# New example demonstrating the get_stations_by_radius function
+central_lat, central_lon = 41.3851, 2.1734  # Barcelona
+radius = 10  # km
+nearby_stations = xptmf.get_stations_by_radius(
+    lat=central_lat,
+    lon=central_lon,
+    radius_km=radius,
+    data_source=stations_metadata # Can be a DataFrame or a path
+)
+print(f"Stations found within {radius} km of Barcelona:")
+print(nearby_stations[['codi_estacio', 'nom_estacio', 'dist_km']])
+
+# Rest of the original plotting code remains the same
 if DOWNLOAD_WEATHER_DATA:
     filters = {
         "codi_estacio": "V4",
@@ -264,4 +251,3 @@ fig = px.line(
 )
 
 fig.show()
-

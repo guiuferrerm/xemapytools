@@ -1,5 +1,10 @@
 # Changelog
 
+## v1.1.0 — 2025-08-20
+- Added functions for searching stations within radius
+- Added example for new functions
+- Updated README and added documentation *(incomplete)*
+
 ## v1.0.0 — 2025-08-13
 - First fully working release
 - Fixed general functions and inconsistencies in standard mappings
